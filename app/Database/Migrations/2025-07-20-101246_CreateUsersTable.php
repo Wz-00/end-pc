@@ -16,6 +16,10 @@ class CreateUsersTable extends Migration
                 'unsigned' => true, 
                 'auto_increment' => true
             ],
+            'name'      => [
+                'type' => 'VARCHAR', 
+                'constraint' => 100
+            ],
             'username'   => [
                 'type' => 'VARCHAR', 
                 'constraint' => 100]
@@ -27,6 +31,11 @@ class CreateUsersTable extends Migration
             'password'   => [
                 'type' => 'VARCHAR', 
                 'constraint' => 255
+            ],
+            'role'       => [
+                'type' => 'ENUM', 
+                'constraint' => ['admin', 'user'], 
+                'default' => 'user'
             ],
             'created_at' => [
                 'type' => 'DATETIME', 

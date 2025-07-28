@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class User extends Model
+class TransactionItem extends Model
 {
-    protected $table            = 'users';
+    protected $table            = 'transactionitems';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['username', 'email', 'password', 'role'];
+    protected $allowedFields    = ['transaction_id', 'product_id', 'quantity', 'price_per_item', 'subtotal'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

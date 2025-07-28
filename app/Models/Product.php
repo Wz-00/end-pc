@@ -12,7 +12,7 @@ class Product extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['product_name', 'image', 'description', 'price', 'cat_id'];
+    protected $allowedFields    = ['product_name', 'image', 'description', 'price', 'cat_id', 'type', 'stock', 'slug'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

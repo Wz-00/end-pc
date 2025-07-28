@@ -16,8 +16,8 @@ class CreateTransactionsTable extends Migration
                 'auto_increment'=> true
             ],
             'transaction_id'   => [
-                'type'          => 'VARCHAR', 
-                'constraint'    => 100
+                'type'          => 'CHAR', 
+                'constraint'    => 14
             ],
             'user_id'           => [
                 'type'          => 'INT'
