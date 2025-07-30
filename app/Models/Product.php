@@ -7,12 +7,12 @@ use CodeIgniter\Model;
 class Product extends Model
 {
     protected $table            = 'products';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'product_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['product_name', 'image', 'description', 'price', 'cat_id'];
+    protected $allowedFields    = ['product_name', 'image', 'description', 'price', 'cat_id', 'slug', 'stock'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

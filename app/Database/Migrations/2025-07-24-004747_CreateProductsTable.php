@@ -10,13 +10,19 @@ class CreateProductsTable extends Migration
     {
         $this->forge->addField([
             'product_id'        => [
-                'type'          => 'VARCHAR', 
-                'constraint'    => 13
+                'type'          => 'INT', 
+                'constraint'    => 11, 
+                'unsigned'      => true, 
+                'auto_increment'=> true
             ],
             'cat_id'            => [
                 'type'          => 'INT'
             ],
             'product_name'      => [
+                'type'          => 'VARCHAR', 
+                'constraint'    => 255
+            ],
+            'slug'             => [
                 'type'          => 'VARCHAR', 
                 'constraint'    => 255
             ],
@@ -28,13 +34,18 @@ class CreateProductsTable extends Migration
                 'type'          => 'VARCHAR', 
                 'constraint'    => 255
             ],
+            'stock'             => [
+                'type'          => 'INT', 
+                'constraint'    => 11, 
+                'default'       => 0
+            ],
             'price'             => [
                 'type'          => 'DECIMAL', 
                 'constraint'    => '10,2'
             ]
         ]);
         $this->forge->addKey('product_id', true);
-        $this->forge->addForeignKey('cat_id', 'categories', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('cat_id', 'categories', 'category_id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('products');
     }
 

@@ -7,12 +7,12 @@ use CodeIgniter\Model;
 class Category extends Model
 {
     protected $table            = 'categories';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'category_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['category'];
+    protected $allowedFields    = ['category', 'slug'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -10,11 +10,15 @@ class CreateUsersTable extends Migration
     public function up()
     {
         $this->forge->addField([
-            'id'         => [
+            'user_id'         => [
                 'type' => 'INT', 
                 'constraint' => 11, 
                 'unsigned' => true, 
                 'auto_increment' => true
+            ],
+            'name'     => [
+                'type' => 'VARCHAR', 
+                'constraint' => 100
             ],
             'username'   => [
                 'type' => 'VARCHAR', 
@@ -28,6 +32,11 @@ class CreateUsersTable extends Migration
                 'type' => 'VARCHAR', 
                 'constraint' => 255
             ],
+            'role'       => [
+                'type' => 'ENUM', 
+                'constraint' => ['admin', 'user'], 
+                'default' => 'user'
+            ],
             'created_at' => [
                 'type' => 'DATETIME', 
                 'null' => true
@@ -37,11 +46,10 @@ class CreateUsersTable extends Migration
                 'null' => true
             ],
         ]);
-        $this->forge->addKey('id', true);
+        $this->forge->addKey('user_id', true);
         $this->forge->createTable('users');
 
-        $now = Time::now(); // atau $now = time();
-        $this->db->query("UPDATE users SET created_at = '{$now->format('Y-m-d H:i:s')}', updated_at = '{$now->format('Y-m-d H:i:s')}'");
+        
     }
 
     public function down()

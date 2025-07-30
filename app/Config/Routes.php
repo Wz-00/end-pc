@@ -31,3 +31,18 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function (RouteCol
     $routes->delete('users/delete', 'Auth::deleteUser');
 });
 
+// category routes
+$routes->group('api/category', ['namespace' => 'App\Controllers\Api', 'filter' => 'adminonly'], function (RouteCollection $routes) {
+    $routes->post('create', 'Product::createCategory'); // Create a new category
+    $routes->put('update', 'Product::updateCategory'); // Update a category 
+    $routes->delete('delete/(:segment)', 'Product::deleteCategory/$1'); // Delete a category by ID
+    $routes->get('index', 'Product::index'); // Get all categories
+});
+
+// product routes
+$routes->group('api/product', ['namespace' => 'App\Controllers\Api', 'filter' => 'adminonly'], function (RouteCollection $routes) {
+    $routes->post('create', 'Product::createProduct'); // Create a new product
+    $routes->put('update', 'Product::updateProduct'); // Update a product
+    $routes->delete('delete/(:segment)', 'Product::deleteProduct/$1'); // Delete a product by ID
+});
+
