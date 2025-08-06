@@ -2,19 +2,111 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
 use App\Models\Product as ProductModel;
 use App\Models\Category as CategoryModel;
-class Product extends BaseController
+class Product extends ResourceController
 {
+    protected $format = 'json';
+    protected $categoryModel;
+    protected $productModel;
+    public function __construct()
+    {
+        $this->categoryModel = new CategoryModel();
+        $this->productModel  = new ProductModel();
+    }
     // CRUD Category
-    public function index(){
+    public function getCategory(){
+        $includeCount = $this->request->getGet('with_count') === '1';
+        $categories = $this->categoryModel->findAll();
+
+        if ($includeCount) {
+            foreach ($categories as &$cat) {
+                $cat['product_count'] = $this->productModel
+                    ->where('cat_id', $cat['category_id'])
+                    ->countAllResults();
+            }
+        }
+
         return $this->response->setJSON([
             'status' => true,
-            'message' => 'Welcome to Product API'
+            'data'   => $categories
         ]);
     }
+
+    public function getCategorybyId($slug)
+    {
+        if (!$slug) {
+            return $this->failNotFound('Category slug is required.');
+        }
+
+        $category = $this->categoryModel->where('slug', $slug)->first();
+        log_message('debug', 'Category Data: ' . json_encode($category));
+
+        if (!$category) {
+            return $this->failNotFound("Category with slug '{$slug}' not found.");
+        }
+
+        $withProducts = $this->request->getGet('with_products');
+        $includeProducts = false;
+
+        if (!is_null($withProducts)) {
+            $includeProducts = in_array(strtolower($withProducts), ['1', 'true', 'yes'], true);
+        }
+
+        if ($includeProducts) {
+            $products = $this->productModel
+                ->where('cat_id', $category['category_id'])
+                ->findAll();
+            log_message('debug', 'Products Found: ' . json_encode($products));
+
+            $category['products'] = $products;
+        }
+
+        return $this->respond([
+            'status' => true,
+            'data'   => $category
+        ]);
+    }
+
+    public function getAllProduct(){
+        $includeCount = $this->request->getGet('with_count') === '1';
+        $products = $this->productModel->findAll();
+
+        // if ($includeCount) {
+        //     foreach ($products as &$prod) {
+        //         $prod['category'] = $this->categoryModel
+        //             ->where('category_id', $prod['cat_id'])
+        //             ->first();
+        //     }
+        // }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $products
+        ]);
+    }
+
+    public function getProductsBySlug($slug)
+    {
+        if (!$slug) {
+            return $this->failNotFound('Product slug is required.');
+        }
+
+        $product = $this->productModel->where('slug', $slug)->first();
+        log_message('debug', 'Product Data: ' . json_encode($product));
+
+        if (!$product) {
+            return $this->failNotFound("Product with slug '{$slug}' not found.");
+        }
+
+        return $this->respond([
+            'status' => true,
+            'data'   => $product
+        ]);
+    }
+
     public function createCategory()
     {
         $data = $this->request->getPost();

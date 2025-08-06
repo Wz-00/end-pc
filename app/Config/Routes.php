@@ -36,7 +36,12 @@ $routes->group('api/category', ['namespace' => 'App\Controllers\Api', 'filter' =
     $routes->post('create', 'Product::createCategory'); // Create a new category
     $routes->put('update', 'Product::updateCategory'); // Update a category 
     $routes->delete('delete/(:segment)', 'Product::deleteCategory/$1'); // Delete a category by ID
-    $routes->get('index', 'Product::index'); // Get all categories
+});
+
+$routes->group('api/category', ['namespace' => 'App\Controllers\Api'], function($routes) {
+    $routes->get('', 'Product::getCategory');                    // GET /api/category
+    $routes->get('(:segment)', 'Product::getCategorybyId/$1');       // GET /api/category/(slug)  (opsional: detail)
+    $routes->get('(:segment)/products', 'Product::getProductsByCategory/$1'); // GET products per category
 });
 
 // product routes
@@ -44,5 +49,17 @@ $routes->group('api/product', ['namespace' => 'App\Controllers\Api', 'filter' =>
     $routes->post('create', 'Product::createProduct'); // Create a new product
     $routes->put('update', 'Product::updateProduct'); // Update a product
     $routes->delete('delete/(:segment)', 'Product::deleteProduct/$1'); // Delete a product by ID
+});
+
+$routes->group('api/product', ['namespace' => 'App\Controllers\Api'], function($routes) {
+    $routes->get('', 'Product::getAllProduct');                    // GET /api/product
+    $routes->get('(:segment)', 'Product::getProductsBySlug/$1');       // GET /api/product/(slug) 
+});
+
+// Transaction routes
+$routes->group('api/transaction', ['namespace' => 'App\Controllers\Api'], function (RouteCollection $routes) {
+    $routes->post('create', 'Transaction::createTransaction'); // Create a new transaction
+    $routes->put('update/(:segment)', 'Transaction::updateTransaction/$1'); // Update a transaction by ID
+    $routes->delete('delete/(:segment)', 'Transaction::deleteTransaction/$1'); // Delete a transaction by ID
 });
 
