@@ -56,10 +56,10 @@ $routes->group('api/product', ['namespace' => 'App\Controllers\Api'], function($
     $routes->get('(:segment)', 'Product::getProductsBySlug/$1');       // GET /api/product/(slug) 
 });
 
-// Transaction routes
-$routes->group('api/transaction', ['namespace' => 'App\Controllers\Api'], function (RouteCollection $routes) {
-    $routes->post('create', 'Transaction::createTransaction'); // Create a new transaction
-    $routes->put('update/(:segment)', 'Transaction::updateTransaction/$1'); // Update a transaction by ID
-    $routes->delete('delete/(:segment)', 'Transaction::deleteTransaction/$1'); // Delete a transaction by ID
+// Cart routes
+$routes->group('api/cart', ['namespace' => 'App\Controllers\Api'], function (RouteCollection $routes) {
+    $routes->post('add', 'Cart::addCart'); // Add a new Cart
+    $routes->get('view', 'Cart::getCart'); // View a Cart by ID
+    $routes->delete('delete/(:segment)', 'Cart::removeFromCart/$1'); // Delete a Cart by ID
 });
 
