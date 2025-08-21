@@ -69,31 +69,6 @@ class Product extends ResourceController
             'data'   => $category
         ]);
     }
-    public function getProductsByCategory($slug)
-    {
-        if (!$slug) {
-            return $this->failNotFound('Category slug is required.');
-        }
-
-        $category = $this->categoryModel->where('slug', $slug)->first();
-        log_message('debug', 'Category Data: ' . json_encode($category));
-
-        if (!$category) {
-            return $this->failNotFound("Category with slug '{$slug}' not found.");
-        }
-
-        $products = $this->productModel
-            ->where('cat_id', $category['category_id'])
-            ->findAll();
-
-        return $this->respond([
-            'status' => true,
-            'data'   => [
-                'category' => $category,
-                'products' => $products
-            ]
-        ]);
-    }
 
     public function getAllProduct(){
         $includeCount = $this->request->getGet('with_count') === '1';

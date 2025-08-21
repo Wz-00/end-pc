@@ -51,6 +51,22 @@ class Auth extends BaseController
         ]);
     }
 
+    public function verifyOtp()
+    {
+        $otpModel = new OtpModel();
+        $data = $this->request->getPost();
+        $otp = $otpModel
+            ->where('email', $data['email'])
+            ->where('otp', $data['otp'])
+            ->where('expires_at >=', date('Y-m-d H:i:s'))
+            ->first();
+
+        if ($otp) {
+            return $this->response->setJSON(['status' => true]);
+        }
+        return $this->response->setJSON(['status' => false, 'message' => 'OTP invalid']);
+    }
+
     public function register()
     {
         $data = $this->request->getPost();
@@ -149,19 +165,8 @@ class Auth extends BaseController
 
     public function resetPassword()
     {
-        $data = $this->request->getRawInput();
-
-        $password = isset($data['password']) ? $data['password'] : null;
-        $confirm = isset($data['confirm_password']) ? $data['confirm_password'] : null;
-
-        if (!$password || !$confirm) {
-            return $this->response->setJSON([
-                'status' => false,
-                'message' => 'Password dan konfirmasi password wajib diisi'
-            ]);
-        }
-
-        if ($password !== $confirm) {
+        $data = $this->request->getPost();
+        if ($data['password'] !== $data['confirm_password']) {
             return $this->response->setJSON(['status' => false, 'message' => 'Password tidak cocok']);
         }
 
@@ -171,11 +176,23 @@ class Auth extends BaseController
             return $this->response->setJSON(['status' => false, 'message' => 'Email tidak ditemukan']);
         }
 
-        $userModel->update($user['user_id'], ['password' => password_hash($password, PASSWORD_BCRYPT)]);
+        $userModel->update($user['id'], ['password' => password_hash($data['password'], PASSWORD_BCRYPT)]);
         return $this->response->setJSON(['status' => true, 'message' => 'Password berhasil diubah']);
     }
     public function deleteUser()
-    {        
+    {
+        // $email = $this->request->getPost('email');
+        // $userModel = new UserModel();
+        // $user = $userModel->where('email', $email)->first();
+
+        // if (!$user) {
+        //     return $this->response->setJSON(['status' => false, 'message' => 'User tidak ditemukan']);
+        // }
+
+        // $userModel->delete($user['id']);
+        // return $this->response->setJSON(['status' => true, 'message' => 'User berhasil dihapus']);
+
+        
         // Ambil token JWT dari header
         $authHeader = $this->request->getHeaderLine('Authorization');
         $token = str_replace('Bearer ', '', $authHeader);
@@ -188,18 +205,13 @@ class Auth extends BaseController
         }
 
         $userModel = new UserModel();
-        // Cek apakah user dengan email tersebut ada
         $user = $userModel->where('email', $email)->first();
 
         if (!$user) {
             return $this->response->setJSON(['status' => false, 'message' => 'User tidak ditemukan']);
         }
-        // cek apakah user adalah admin
-        if ($user['role'] === 'admin') {
-            return $this->response->setJSON(['status' => false, 'message' => 'Tidak dapat menghapus akun admin']);
-        }
 
-        $userModel->delete($user['user_id']);
+        $userModel->delete($user['id']);
         return $this->response->setJSON(['status' => true, 'message' => 'User berhasil dihapus']);
     }
 }
