@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+.auth-endpoint .row, 
+.category-endpoint .row,
+.product-endpoint .row {
+    border: black 1px solid;
+    margin: 1vh 0;
+}
+.auth-endpoint .row .method,
+.category-endpoint .row .method,
+.product-endpoint .row .method {
+    background-color: red;
+    color: white;
+    border-right: 1px solid #dee2e6;
+    text-align: center;
+}
+.auth-endpoint .row .method p, 
+.category-endpoint .row .method p,
+.product-endpoint .row .method p {
+    margin: 0;
+    padding: 10px;
+    font-weight: bold;
+}
+.auth-endpoint .row .endpoint, 
+.category-endpoint .row .endpoint,
+.product-endpoint .row .endpoint {
+    background-color: white;
+    color: black;
+}
+.auth-endpoint .row .endpoint code, 
+.category-endpoint .row .endpoint code,
+.product-endpoint .row .endpoint code {
+    padding: 10px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    color: black;
+}
+
+.endpoint-information {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
