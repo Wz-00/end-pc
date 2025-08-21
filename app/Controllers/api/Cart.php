@@ -29,6 +29,22 @@ class Cart extends ResourceController
                 'message' => 'Product ID is required'
             ])->setStatusCode(400);
         }
+        if ($quantity < 1) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Quantity must be at least 1'
+            ])->setStatusCode(400);
+        }
+
+        // cek apakah produk ada di database
+        $productModel = new \App\Models\Product();
+        $product = $productModel->find($productId);
+        if (!$product) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Product not found'
+            ])->setStatusCode(404);
+        }
 
         // Cek apakah user login via JWT
         $userId = $this->getUserIdFromJWT();
@@ -81,6 +97,66 @@ class Cart extends ResourceController
             return $this->respond([
                 'status' => true,
                 'message' => 'Added to cart (guest)'
+            ]);
+        }
+    }
+    public function updateCart()
+    {
+        $request = $this->request->getRawInput();
+        $cartId = $request['id'] ?? null;
+        $quantity = $request['quantity'] ?? 1;
+
+        if (!$cartId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Cart ID is required'
+            ])->setStatusCode(400);
+        }
+        if ($quantity < 1) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Quantity must be at least 1'
+            ])->setStatusCode(400);
+        }
+        // Cek apakah user login via JWT
+        $userId = $this->getUserIdFromJWT();
+        if ($userId) {
+            // User login: Update di database
+            $cartItem = $this->cartModel
+                ->where('user_id', $userId)
+                ->where('id', $cartId)
+                ->first();
+
+            if (!$cartItem) {
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Cart item not found'
+                ])->setStatusCode(404);
+            }
+
+            $cartItem['quantity'] = $quantity;
+            $this->cartModel->update($cartItem['id'], $cartItem);
+
+            return $this->respond([
+                'status' => true,
+                'message' => 'Cart updated (user)'
+            ]);
+        } else {
+            // Guest user: Update di session
+            $session = session();
+            $cart = $session->get('cart') ?? [];
+
+            foreach ($cart as &$item) {
+                if ($item['id'] == $cartId) {
+                    $item['quantity'] = $quantity;
+                    break;
+                }
+            }
+
+            $session->set('cart', $cart);
+            return $this->respond([
+                'status' => true,
+                'message' => 'Cart updated (guest)'
             ]);
         }
     }

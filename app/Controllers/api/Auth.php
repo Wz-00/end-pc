@@ -77,6 +77,15 @@ class Auth extends BaseController
             return $this->response->setJSON(['status' => false, 'message' => 'Email sudah terdaftar']);
         }
 
+        // Validasi input
+        if (empty($data['email']) || empty($data['name']) || empty($data['username']) || empty($data['password']) || empty($data['confirm_password'])) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Semua field wajib diisi']);
+        }
+        // Validasi password
+        if ($data['password'] !== $data['confirm_password']) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Password tidak cocok']);
+        }
+
         // Validasi OTP
         if (empty($data['otp'])) {
             return $this->response->setJSON(['status' => false, 'message' => 'OTP wajib diisi']);
@@ -94,6 +103,7 @@ class Auth extends BaseController
 
         // Insert user jika OTP valid
         $userModel->insert([
+            'name' => $data['name'],
             'email' => $data['email'],
             'username' => $data['username'],
             'password' => password_hash($data['password'], PASSWORD_BCRYPT)
@@ -165,7 +175,7 @@ class Auth extends BaseController
 
     public function resetPassword()
     {
-        $data = $this->request->getPost();
+        $data = $this->request->getRawInput();
         if ($data['password'] !== $data['confirm_password']) {
             return $this->response->setJSON(['status' => false, 'message' => 'Password tidak cocok']);
         }
@@ -176,23 +186,11 @@ class Auth extends BaseController
             return $this->response->setJSON(['status' => false, 'message' => 'Email tidak ditemukan']);
         }
 
-        $userModel->update($user['id'], ['password' => password_hash($data['password'], PASSWORD_BCRYPT)]);
+        $userModel->update($user['user_id'], ['password' => password_hash($data['password'], PASSWORD_BCRYPT)]);
         return $this->response->setJSON(['status' => true, 'message' => 'Password berhasil diubah']);
     }
     public function deleteUser()
-    {
-        // $email = $this->request->getPost('email');
-        // $userModel = new UserModel();
-        // $user = $userModel->where('email', $email)->first();
-
-        // if (!$user) {
-        //     return $this->response->setJSON(['status' => false, 'message' => 'User tidak ditemukan']);
-        // }
-
-        // $userModel->delete($user['id']);
-        // return $this->response->setJSON(['status' => true, 'message' => 'User berhasil dihapus']);
-
-        
+    {        
         // Ambil token JWT dari header
         $authHeader = $this->request->getHeaderLine('Authorization');
         $token = str_replace('Bearer ', '', $authHeader);
@@ -210,8 +208,17 @@ class Auth extends BaseController
         if (!$user) {
             return $this->response->setJSON(['status' => false, 'message' => 'User tidak ditemukan']);
         }
+        // cek apakah user adalah admin
+        if ($user['role'] === 'admin') {   
+            return $this->response->setJSON(['status' => false, 'message' => 'Tidak dapat menghapus akun admin']);
+        }
 
-        $userModel->delete($user['id']);
+        $userModel->delete($user['user_id']);
         return $this->response->setJSON(['status' => true, 'message' => 'User berhasil dihapus']);
+    }
+    public function logout(){
+        // Hapus token JWT dari sisi klien (frontend)
+        // Tidak ada aksi di server, cukup menghapus token di sisi klien
+        return $this->response->setJSON(['status' => true, 'message' => 'Logout berhasil']);
     }
 }

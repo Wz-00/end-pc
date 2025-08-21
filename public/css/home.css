@@ -4,13 +4,15 @@ body {
 }
 .auth-endpoint .row, 
 .category-endpoint .row,
-.product-endpoint .row {
+.product-endpoint .row,
+.cart-endpoint .row {
     border: black 1px solid;
     margin: 1vh 0;
 }
 .auth-endpoint .row .method,
 .category-endpoint .row .method,
-.product-endpoint .row .method {
+.product-endpoint .row .method,
+.cart-endpoint .row .method {
     background-color: red;
     color: white;
     border-right: 1px solid #dee2e6;
@@ -18,20 +20,23 @@ body {
 }
 .auth-endpoint .row .method p, 
 .category-endpoint .row .method p,
-.product-endpoint .row .method p {
+.product-endpoint .row .method p,
+.cart-endpoint .row .method p {
     margin: 0;
     padding: 10px;
     font-weight: bold;
 }
 .auth-endpoint .row .endpoint, 
 .category-endpoint .row .endpoint,
-.product-endpoint .row .endpoint {
+.product-endpoint .row .endpoint,
+.cart-endpoint .row .endpoint {
     background-color: white;
     color: black;
 }
 .auth-endpoint .row .endpoint code, 
 .category-endpoint .row .endpoint code,
-.product-endpoint .row .endpoint code {
+.product-endpoint .row .endpoint code,
+.cart-endpoint .row .endpoint code {
     padding: 10px;
     display: block;
     overflow-x: auto;
