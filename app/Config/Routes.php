@@ -66,4 +66,10 @@ $routes->group('api/cart', ['namespace' => 'App\Controllers\Api'], function (Rou
     $routes->delete('delete/(:segment)', 'Cart::removeFromCart/$1'); // Delete a Cart by ID
     $routes->put('update', 'Cart::updateCart'); // Update a Cart 
 });
+// node routes
+$routes->group('api/cart', ['namespace' => 'App\Controllers\Api', 'filter' => 'nodeauth'], function ($routes) {
+    $routes->post('get-items', 'Cart::getNodeItems');
+    $routes->post('clear', 'Cart::clearNodeCart');
+    $routes->post('auth/resolve-user', 'Cart::resolveUser');
+});
 

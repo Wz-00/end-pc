@@ -7,12 +7,12 @@ use CodeIgniter\Model;
 class Cart extends Model
 {
     protected $table            = 'carts';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'cart_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['user_id', 'product_id', 'quantity'];
+    protected $allowedFields    = ['user_id', 'product_id', 'quantity', 'guest_identifier'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -18,12 +18,18 @@ class CreateCartsTable extends Migration
             'user_id'           => [
                 'type'          => 'INT',
                 'constraint'    => 11,
-                'unsigned'      => true
+                'unsigned'      => true,
+                'null'          => true
             ],
             'product_id'        => [
                 'type'          => 'INT',
                 'constraint'    => 11,
                 'unsigned'      => true
+            ],
+            'guest_identifier'   => [
+                'type'          => 'VARCHAR',
+                'constraint'    => 64,
+                'null'          => true
             ],
             'quantity'          => [
                 'type'          => 'INT',

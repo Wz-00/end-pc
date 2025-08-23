@@ -36,6 +36,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'adminonly'     => AdminOnly::class,
+        'nodeauth' => \App\Filters\NodeAuth::class,
     ];
 
     /**
