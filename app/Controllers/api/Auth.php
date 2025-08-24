@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Controllers\BaseController;
+use App\Models\UserDetail as UserDetail;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\User as UserModel;
 use App\Models\Otp as OtpModel;
@@ -220,5 +221,169 @@ class Auth extends BaseController
         // Hapus token JWT dari sisi klien (frontend)
         // Tidak ada aksi di server, cukup menghapus token di sisi klien
         return $this->response->setJSON(['status' => true, 'message' => 'Logout berhasil']);
+    }
+    public function addAddress(){
+        helper('cookie');
+
+        $request = $this->request->getPost();
+        $userDetail = new UserDetail();
+
+        $userId = $this->getUserIdFromJWT();
+        $guestIdentifier = get_cookie('guest_identifier');
+
+        if(empty($request['address']) || empty($request['city']) || empty($request['postal_code']) || empty($request['country']) || empty($request['phone'])){
+            return $this->response->setJSON(['status' => false, 'message' => 'Semua field wajib diisi'])->setStatusCode(400);
+        }
+        
+        //cek apakah user atau guest sudah punya alamat
+        if($userDetail->where('user_id', $userId)->orWhere('guest_identifier', $guestIdentifier)->first()){
+            return $this->response->setJSON(['status' => false, 'message' => 'Alamat sudah terisi di akun anda'])->setStatusCode(400);
+        }
+        
+        if ($userId) {
+            $userDetail->insert([
+                'user_id' => $userId,
+                'address' => $request['address'],
+                'city' => $request['city'],
+                'postal_code' => $request['postal_code'],
+                'country' => $request['country'],
+                'phone' => $request['phone']
+            ]);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil ditambahkan (user)']);
+        } else if($guestIdentifier) {
+            $userDetail->insert([
+                'guest_identifier' => $guestIdentifier,
+                'address' => $request['address'],
+                'city' => $request['city'],
+                'postal_code' => $request['postal_code'],
+                'country' => $request['country'],
+                'phone' => $request['phone']
+            ]);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil ditambahkan (guest)']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
+        }
+        
+    }
+    public function getAddresses(){
+        helper('cookie');
+
+        $userId = $this->getUserIdFromJWT();
+        $guestIdentifier = get_cookie('guest_identifier');
+        $userDetail = new UserDetail();
+
+        if ($userId) {
+            $address = $userDetail->where('user_id', $userId)->first();
+        } else if($guestIdentifier) {
+            $address = $userDetail->where('guest_identifier', $guestIdentifier)->first();
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
+        }
+
+        if($address){
+            return $this->response->setJSON(['status' => true, 'data' => $address]);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'Alamat tidak ditemukan'])->setStatusCode(404);
+        }
+    }
+    public function updateAddress(){
+        helper('cookie');
+
+        $request = $this->request->getRawInput();
+        $userDetail = new UserDetail();
+
+        $userId = $this->getUserIdFromJWT();
+        $guestIdentifier = get_cookie('guest_identifier');
+
+        if(empty($request['address']) || empty($request['city']) || empty($request['postal_code']) || empty($request['country']) || empty($request['phone'])){
+            return $this->response->setJSON(['status' => false, 'message' => 'Semua field wajib diisi'])->setStatusCode(400);
+        }
+
+        if ($userId) {
+            $existing = $userDetail->where('user_id', $userId)->first();
+            if(!$existing){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat tidak ditemukan untuk user ini'])->setStatusCode(404);
+            }
+            $userDetail->update($existing['uid'], [
+                'address' => $request['address'],
+                'city' => $request['city'],
+                'postal_code' => $request['postal_code'],
+                'country' => $request['country'],
+                'phone' => $request['phone']
+            ]);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil diperbarui (user)']);
+        } else if($guestIdentifier) {
+            $existing = $userDetail->where('guest_identifier', $guestIdentifier)->first();
+            if(!$existing){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat tidak ditemukan untuk guest ini'])->setStatusCode(404);
+            }
+            $userDetail->update($existing['uid'], [
+                'address' => $request['address'],
+                'city' => $request['city'],
+                'postal_code' => $request['postal_code'],
+                'country' => $request['country'],
+                'phone' => $request['phone']
+            ]);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil diperbarui (guest)']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
+        }
+    }
+    public function deleteAddress(){
+        helper('cookie');
+
+        $userId = $this->getUserIdFromJWT();
+        $guestIdentifier = get_cookie('guest_identifier');
+        $userDetail = new UserDetail();
+
+        if ($userId) {
+            $existing = $userDetail->where('user_id', $userId)->first();
+            if(!$existing){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat tidak ditemukan untuk user ini'])->setStatusCode(404);
+            }
+            $userDetail->delete($existing['uid']);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil dihapus (user)']);
+        } else if($guestIdentifier) {
+            $existing = $userDetail->where('guest_identifier', $guestIdentifier)->first();
+            if(!$existing){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat tidak ditemukan untuk guest ini'])->setStatusCode(404);
+            }
+            $userDetail->delete($existing['uid']);
+            return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil dihapus (guest)']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
+        }
+    }
+    private function getUserIdFromJWT()
+    {
+        $authHeader = $this->request->getHeaderLine('Authorization');
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return null;
+        }
+
+        $token = str_replace('Bearer ', '', $authHeader);
+
+        try {
+            helper('jwt'); // panggil helper Anda
+            $decoded = verifyJWT($token);
+
+            $email = $decoded->email ?? null;
+            if (!$email) {
+                return null;
+            }
+
+            // Query user_id berdasarkan email
+            $db = \Config\Database::connect();
+            $builder = $db->table('users');
+            $user = $builder->select('user_id')
+                            ->where('email', $email)
+                            ->get()
+                            ->getRow();
+
+            return $user ? $user->user_id : null;
+
+        } catch (\Exception $e) {
+            return null; // JWT tidak valid atau expired
+        }
     }
 }

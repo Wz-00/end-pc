@@ -32,6 +32,12 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function (RouteCol
 
     // Logout
     $routes->post('auth/logout', 'Auth::logout'); // Logout user (simulasi hapus token JWT)
+
+    // User detail and address management
+    $routes->post('auth/address/add', 'Auth::addAddress');
+    $routes->get('auth/address', 'Auth::getAddresses');
+    $routes->put('auth/address/update', 'Auth::updateAddress');
+    $routes->delete('auth/address/delete', 'Auth::deleteAddress/');
 });
 
 // category routes

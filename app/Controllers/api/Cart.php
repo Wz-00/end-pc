@@ -277,10 +277,10 @@ class Cart extends ResourceController
                 'message' => 'Harus mengirim user_id atau guest_identifier'
             ])->setStatusCode(400);
         }
-        log_message('debug', '=== DEBUG CI4 ===');
-        log_message('debug', 'cartIds: ' . json_encode($cartIds));
-        log_message('debug', 'userId: ' . $userId);
-        log_message('debug', 'guestIdentifier: ' . $guestIdentifier);
+        // log_message('debug', '=== DEBUG CI4 ===');
+        // log_message('debug', 'cartIds: ' . json_encode($cartIds));
+        // log_message('debug', 'userId: ' . $userId);
+        // log_message('debug', 'guestIdentifier: ' . $guestIdentifier);
 
         $builder = $this->cartModel
             ->select('carts.*, products.product_name, products.price, products.image')
