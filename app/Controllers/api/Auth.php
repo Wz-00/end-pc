@@ -10,26 +10,6 @@ use App\Models\Otp as OtpModel;
 helper('jwt');
 class Auth extends BaseController
 {
-    // public function getUsers()
-    // {
-    //     $userModel = new UserModel;
-    //     $users = $userModel->findAll();
-
-    //     return $this->response->setJSON([
-    //         'status' => true,
-    //         'data' => $users
-    //     ]);
-    // }
-    // public function getOtps()
-    // {
-    //     $otpModel = new OtpModel();
-    //     $otps = $otpModel->orderBy('expires_at', 'DESC')->findAll();
-
-    //     return $this->response->setJSON([
-    //         'status' => true,
-    //         'data' => $otps
-    //     ]);
-    // }
     public function sendOtp()
     {
         $email = $this->request->getPost('email');
@@ -224,23 +204,19 @@ class Auth extends BaseController
     }
     public function addAddress(){
         helper('cookie');
-
         $request = $this->request->getPost();
         $userDetail = new UserDetail();
 
         $userId = $this->getUserIdFromJWT();
-        $guestIdentifier = get_cookie('guest_identifier');
-
-        if(empty($request['address']) || empty($request['city']) || empty($request['postal_code']) || empty($request['country']) || empty($request['phone'])){
-            return $this->response->setJSON(['status' => false, 'message' => 'Semua field wajib diisi'])->setStatusCode(400);
-        }
-        
-        //cek apakah user atau guest sudah punya alamat
-        if($userDetail->where('user_id', $userId)->orWhere('guest_identifier', $guestIdentifier)->first()){
-            return $this->response->setJSON(['status' => false, 'message' => 'Alamat sudah terisi di akun anda'])->setStatusCode(400);
-        }
-        
+                
         if ($userId) {
+            log_message('debug', 'DEBUG CI4: addAddress() dipanggil dengan userId=' . $userId);
+            // check if user already has an address
+            if($userDetail->where('user_id', $userId)->first()){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat sudah terisi di akun anda'])->setStatusCode(400);
+            }
+            // remove cookies if user is logged in
+            delete_cookie('guest_identifier');
             $userDetail->insert([
                 'user_id' => $userId,
                 'address' => $request['address'],
@@ -249,9 +225,17 @@ class Auth extends BaseController
                 'country' => $request['country'],
                 'phone' => $request['phone']
             ]);
+            log_message('debug', 'DEBUG CI4: addAddress() dipanggil dengan request=' . json_encode($request));
             return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil ditambahkan (user)']);
-        } else if($guestIdentifier) {
-            $userDetail->insert([
+        } else {
+            
+            $guestIdentifier = get_cookie('guest_identifier');
+            log_message('debug', 'DEBUG CI4: addAddress() dipanggil dengan guestIdentifier=' . $guestIdentifier);
+            if($userDetail->where('guest_identifier', $guestIdentifier)->first()){
+                return $this->response->setJSON(['status' => false, 'message' => 'Alamat sudah terisi di akun anda'])->setStatusCode(400);
+            }
+            if($guestIdentifier) {
+                $userDetail->insert([
                 'guest_identifier' => $guestIdentifier,
                 'address' => $request['address'],
                 'city' => $request['city'],
@@ -259,10 +243,16 @@ class Auth extends BaseController
                 'country' => $request['country'],
                 'phone' => $request['phone']
             ]);
+            log_message('debug', 'DEBUG CI4: addAddress() dipanggil dengan request=' . json_encode($request));
             return $this->response->setJSON(['status' => true, 'message' => 'Alamat berhasil ditambahkan (guest)']);
-        } else {
-            return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
-        }
+            }
+            else {
+                return $this->response->setJSON(['status' => false, 'message' => 'User tidak terautentikasi dan tidak ada guest identifier'])->setStatusCode(401);
+            }
+            
+        } 
+        
+        
         
     }
     public function getAddresses(){

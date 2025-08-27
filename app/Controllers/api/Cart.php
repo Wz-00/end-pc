@@ -5,6 +5,8 @@ namespace App\Controllers\Api;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\Cart as CartModel;
+use App\Models\User;
+use App\Models\UserDetail as UserDetailModel;
 
 class Cart extends ResourceController
 {
@@ -371,6 +373,44 @@ class Cart extends ResourceController
         return $this->response->setJSON([
             'status' => 'success',
             'user_id' => $user->user_id
+        ]);
+    }
+    public function getDetail($userId)
+    {
+        $userDetailModel = new UserDetailModel();
+        $detail = $userDetailModel->where('user_id', $userId)->first();
+
+        log_message('debug', 'User detail API called. user_id={id}, user=' . print_r($userId, true));
+        log_message('debug', 'Detail=' . print_r($detail, true));
+
+        if (!$detail) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Detail user tidak ditemukan'
+            ])->setStatusCode(404);
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $detail
+        ]);
+    }
+
+    public function getDetailGuest($guestIdentifier)
+    {
+        $userDetailModel = new UserDetailModel();
+        $detail = $userDetailModel->where('guest_identifier', $guestIdentifier)->first();
+
+        if (!$detail) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Detail guest tidak ditemukan'
+            ])->setStatusCode(404);
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $detail
         ]);
     }
 

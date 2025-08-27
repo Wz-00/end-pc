@@ -77,5 +77,7 @@ $routes->group('api/cart', ['namespace' => 'App\Controllers\Api', 'filter' => 'n
     $routes->post('get-items', 'Cart::getNodeItems');
     $routes->post('clear', 'Cart::clearNodeCart');
     $routes->post('auth/resolve-user', 'Cart::resolveUser');
+    $routes->get('user-detail/(:segment)', 'Cart::getDetail/$1');
+    $routes->get('guest-detail/(:segment)', 'Cart::getDetailGuest/$1');
 });
 
